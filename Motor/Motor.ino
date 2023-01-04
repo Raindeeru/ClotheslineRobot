@@ -27,6 +27,7 @@ void setup()
 
     delay (2000);
 
+    analogWrite(enA, 255);
     digitalWrite(in1, HIGH);
 }
 
