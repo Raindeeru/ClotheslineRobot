@@ -9,6 +9,8 @@ int in4 = 4; //Turn this on the motor spins backward
 
 void setup()
 {
+    Serial.begin(9600);
+
 	// Set all the motor control pins to outputs
 	pinMode(enA, OUTPUT);
 	pinMode(enB, OUTPUT);
@@ -22,6 +24,10 @@ void setup()
 	digitalWrite(in2, LOW);
 	digitalWrite(in3, LOW);
 	digitalWrite(in4, LOW);
+
+    delay (2000);
+
+    digitalWrite(in1, HIGH);
 }
 
 void loop()
