@@ -2,5 +2,5 @@
     "port": "COM3",
     "board": "arduino:avr:uno",
     "programmer": "arduino:avrisp",
-    "sketch": "EvapEq\\EvapEq.ino"
+    "sketch": "Sensors\\Sensors.ino"
 }
