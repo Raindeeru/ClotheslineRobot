@@ -1,7 +1,7 @@
 void setup()
 {
     Serial.begin(9600);
-    float test = EvapRate(0.87, 286, 10.08, 0);
+    float test = EvapRate(0.87, 286, 117, 0);
     Serial.println(test);
 }
 
