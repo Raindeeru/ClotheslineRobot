@@ -136,14 +136,15 @@ void loop()
     Serial.print("Evaporation Rate: ");
     Serial.println(evapRate);
 
+    //checks if irradiance is above the set threshold, you put the motor activation code here
     if(evapRate>threshold)
     {
-        digitalWrite(13, 1);
+        digitalWrite(13, 1); //turn on the motor
         Serial.println("yo yo yo!");
     }
     else
     {
-        digitalWrite(13, 0);
+        digitalWrite(13, 0); //turn off the motor
     }
 
     if (countThing == 1) // Send data per timeasure seconds
@@ -164,7 +165,6 @@ void rpm_anemometer()
     rpmcount++;
     last_micros = micros();
   }
-  //   Serial.println("***** detect *****");
 }
 
 //This function measures the evaporation
