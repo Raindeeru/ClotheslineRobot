@@ -53,7 +53,7 @@ void loop()
     if (0.37<ldr500val&&ldr500val<0.42)
     {
         irradiance = G5(ldr500val);
-        Serial.println("jakol");
+        Serial.println("bobo");
     }
     
     Serial.println(irradiance);

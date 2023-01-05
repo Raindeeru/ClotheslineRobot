@@ -26,23 +26,33 @@ float calibration_value = 2.0;
 float temperature;
 float humidity;
 
-//Irradiance standin
+//Irradiance parameters
+int ldr100 = A0;
+int ldr500 = A1;
+int ldr1k = A2;
+
+float ldr100val;
+float ldr500val;
+float ldr1kval;
+
 float irradiance;
 
 DHT dht(DHTpin, DHTtype);
 
 void setup()
 {
+    Serial.begin(9600);
     dht.begin();
     
     pinMode(A0, INPUT);
+    pinMode(A1, INPUT);
+    pinMode(A2, INPUT);
+
     pinMode(4, INPUT);
     pinMode(13,OUTPUT);
 
     pinMode(GPIO_pulse, INPUT_PULLUP);
     digitalWrite(GPIO_pulse, LOW);
-
-    Serial.begin(9600);
 
     detachInterrupt(digitalPinToInterrupt(GPIO_pulse));                         // force to initiate Interrupt on zero
     attachInterrupt(digitalPinToInterrupt(GPIO_pulse), rpm_anemometer, RISING); //Initialize the intterrupt pin
@@ -55,7 +65,36 @@ void setup()
 
 void loop()
 {
-    irradiance = analogRead(A0)/100;
+    //irradiance stuff
+    ldr100val = analogRead(ldr100)/204.8;
+    ldr500val = analogRead(ldr500)/204.8;
+    ldr1kval = analogRead(ldr1k)/204.8;
+
+    //I know this code looks ugly, sorry :(
+    if(2.75 < ldr1kval && ldr1kval < 4.76)
+    {
+        irradiance = G1(ldr1kval);
+    }
+
+    if(0.38<ldr100val&&ldr100val<0.61)
+    {
+        irradiance = G2(ldr100val);
+    }
+    else if (0.32<ldr100val&&ldr100val<0.39)
+    {
+        irradiance = G3(ldr100val);
+    }
+    else if (0.29<ldr100val&&ldr100val<0.33)
+    {
+        irradiance = G4(ldr100val);
+    }
+
+    if (0.37<ldr500val&&ldr500val<0.42)
+    {
+        irradiance = G5(ldr500val);
+    }
+
+    //dht stuff
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
 
@@ -63,6 +102,8 @@ void loop()
     if ((millis() - timeold) >= timemeasure * 1000)
     {
     countThing++;
+
+    //wind speeed
     detachInterrupt(digitalPinToInterrupt(GPIO_pulse)); // Disable interrupt when calculating
     rps = float(rpmcount) / float(timemeasure);         // rotations per second
     rpm = 60 * rps;                                     // rotations per minute
@@ -131,7 +172,7 @@ float EvapRate(float h, float t, float u, float r)
 {
     //Energy Balance
     float lv = (2501000) - (2370*t);
-    float Er = (r*41.66)/(lv*997) * 86400000;
+    float Er = (r)/(lv*997) * 86400000;
 
     //Aerodynamic
     float B = (0.102*u)/77.53;
@@ -144,4 +185,31 @@ float EvapRate(float h, float t, float u, float r)
     float E = ((d/(d+66.8))*Er) + ((66.8/(d+66.8))*Ea);
 
     return E;
+}
+
+//for radiation stuff
+//Based on the research paper "Low-Cost Solar Irradiance Meter using LDR Sensors"
+float G1(float v)
+{
+    return 47.52*pow(v,2)-438.01*v+1048;
+}
+
+float G2(float v)
+{
+    return 5512.4*pow(v,2)-6302.7*v+2005.3;
+}
+
+float G3(float v)
+{
+    return 19312*pow(v,2)-16897*v+4049.3;
+}
+
+float G4(float v)
+{
+    return 44630*pow(v,2)-32792*v+6553.5;
+}
+
+float G5(float v)
+{
+    return 47767*pow(v,2)-41939*v+9999.7;
 }
