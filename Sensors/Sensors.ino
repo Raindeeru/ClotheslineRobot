@@ -1,8 +1,8 @@
 #include <DHT.h>
 
-unsigned long timemeasure = 10.00; // seconds
+unsigned long timemeasure = 2.00; // seconds
 
-float threshold = 25.0;
+float threshold = 5.0; //threshold in mm/day of evap rate
 
 // anemometer parameters
 volatile byte rpmcount; // count signals
@@ -55,7 +55,7 @@ void setup()
 
 void loop()
 {
-    irradiance = analogRead(A0);
+    irradiance = analogRead(A0)/100;
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
 
@@ -85,12 +85,12 @@ void loop()
     Serial.println("%");
 
     Serial.print("Solar Radiation: ");
-    Serial.print(irradiance/50);
+    Serial.print(irradiance);
     Serial.println("MW/m^2");
 
     float decHum = humidity * 0.01;
     Serial.println(decHum);
-    float evapRate = EvapRate(decHum, temperature+273, irradiance, velocity_ms);
+    float evapRate = EvapRate(decHum, temperature, velocity_ms, irradiance);
 
     Serial.print("Evaporation Rate: ");
     Serial.println(evapRate);
@@ -126,15 +126,22 @@ void rpm_anemometer()
   //   Serial.println("***** detect *****");
 }
 
-float EvapRate(float hum, float temp, float rad, float windSpeed)
+//This function measures the evaporation
+float EvapRate(float h, float t, float u, float r)
 {
-    float evapRate;
-    float lambda(2.501 - 0.002361*(temp - 273));
-    float y = 165.02/lambda;
-    float ea = exp(21.07 - (5336/temp));
-    float D = (1-hum)*ea;
-    float delta = (5336/pow(temp,2))*D;
+    //Energy Balance
+    float lv = (2501000) - (2370*t);
+    float Er = (r*41.66)/(lv*997) * 86400000;
 
-    evapRate = (delta*rad + y*(6.43*(1+0.536*windSpeed)*D))/(lambda*(delta+y));
-    return evapRate;
+    //Aerodynamic
+    float B = (0.102*u)/77.53;
+    float eas = 611*exp((17.27*t)/(237.3+t));
+    float ea = h*eas;
+    float Ea = B*(eas - ea);
+
+    //Combined
+    float d = (4098*eas)/pow(237.3+t,2);
+    float E = ((d/(d+66.8))*Er) + ((66.8/(d+66.8))*Ea);
+
+    return E;
 }
