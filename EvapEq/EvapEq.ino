@@ -1,7 +1,7 @@
 void setup()
 {
     Serial.begin(9600);
-    float test = EvapRate(0.87, 286, 117, 0);
+    float test = EvapRate(0.5, 13, 2, 4);
     Serial.println(test);
 }
 
@@ -10,16 +10,24 @@ void loop()
 
 }
 
-//This function measures the evaporation rate using penmann-montieth equation
-float EvapRate(float humidity, float temp, float irradiance, float windSpeed)
+//This function measures the evaporation
+float EvapRate(float h, float t, float u, float r)
 {
-    float evapRate;
-    float lambda(2.501 - 0.002361*(temp - 273));
-    float y = 165.02/lambda;
-    float ea = exp(21.07 - (5336/temp));
-    float D = (1-humidity)*ea;
-    float delta = (5336/pow(temp,2))*D;
+    //Energy Balance
+    float lv = (2501000) - (2370*t);
+    float Er = (r*41.66)/(lv*997) * 86400000;
+    Serial.println(Er);
 
-    evapRate = (delta*irradiance + y*(6.43*(1+0.536*windSpeed)*D))/(lambda*(delta+y));
-    return evapRate;
+    //Aerodynamic
+    float B = (0.102*u)/77.53;
+    float eas = 611*exp((17.27*t)/(237.3+t));
+    float ea = h*eas;
+    float Ea = B*(eas - ea);
+    Serial.println(Ea);
+
+    //Combined
+    float d = (4098*eas)/pow(237.3+t,2);
+    float E = ((d/(d+66.8))*Er) + ((66.8/(d+66.8))*Ea);
+
+    return E;
 }
