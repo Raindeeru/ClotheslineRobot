@@ -3,8 +3,8 @@ import math
 import keys
 import json
 
-SOLCAST_KEY = keys.SOLCAST_KEY 
-OPENWEATHERMAP_KEY = keys.OPENWEATHERMAP_KEY
+SOLCAST_KEY = 'S_zP8SO4EnUbnCQsIVSTooAOo5EMmvNZ'
+OPENWEATHERMAP_KEY = '69daeb9d1aaca0b933d930f4e185e3ea'
 
 latitude = '12.9927'
 longitude = '124.0147'
