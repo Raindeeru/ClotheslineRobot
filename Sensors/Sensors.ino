@@ -98,7 +98,6 @@ void loop()
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
 
-    //Measure RPM
     if ((millis() - timeold) >= timemeasure * 1000)
     {
     countThing++;
