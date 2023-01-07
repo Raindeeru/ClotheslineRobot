@@ -24,19 +24,19 @@ headers = {
   'Accept': 'application/json'
 }
 
-#screq = requests.request("GET", solurl, headers=headers, data=payload)
-#soldata = screq.json()
+screq = requests.request("GET", solurl, headers=headers, data=payload)
+soldata = screq.json()
 
 temp = owmdata['main']['temp']-273.15
 hum = owmdata['main']['humidity']
 wind = owmdata['wind']['speed']
-#rad = soldata['estimated_actuals'][0]['ghi']
+rad = soldata['estimated_actuals'][0]['ghi']
 
 
 print('Temperature = '+str(temp)+'°C')
 print('Humidity = '+str(hum)+'%')
 print('Wind Speed = '+str(wind)+'m/s')
-#print('Irradiance = '+str(rad)+'W/m^2')
+print('Irradiance = '+str(rad)+'W/m^2')
 
 def EvapEq(h,t,u,r):
     lv = (2501000) - (2370*t)
@@ -52,10 +52,13 @@ def EvapEq(h,t,u,r):
 
     return e
 
-evaprate = EvapEq(hum*0.01,temp,wind,190)
+evaprate = EvapEq(hum*0.01,temp,wind,rad)
 print('Evaporation Rate = '+str(evaprate)+'mm/day')
 
 if evaprate>threshold:
   print('Clothes Outside')
 else:
   print('Clothes Inside')
+
+print('press anything to exit')
+input()
