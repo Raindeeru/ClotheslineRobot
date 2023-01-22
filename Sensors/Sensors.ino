@@ -172,6 +172,8 @@ void loop()
         digitalWrite(in4, 0);   
         delay(1000);
 
+        isOpen = true;
+
     }
     else if (evapRate<threshold && isOpen)
     {
@@ -188,6 +190,8 @@ void loop()
         digitalWrite(in3, 0);        
         digitalWrite(in4, 0);   
         delay(1000);
+
+        isOpen = false;
     }
 
     if (countThing == 1) // Send data per timeasure seconds
