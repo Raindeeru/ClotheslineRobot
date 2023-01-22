@@ -21,7 +21,7 @@ float omega = 0;    // rad/s
 float calibration_value = 2.0;
 
 //dht22 parameters
-#define DHTpin 4
+#define DHTpin 10
 #define DHTtype DHT22
 float temperature;
 float humidity;
@@ -37,6 +37,18 @@ float ldr1kval;
 
 float irradiance;
 
+//Motor A
+int enA = 9;
+int in1 = 8;
+int in2 = 7;
+
+//Motor B
+int enB = 3;
+int in3 = 5;
+int in4 = 4;
+
+bool isOpen = false;
+
 DHT dht(DHTpin, DHTtype);
 
 void setup()
@@ -50,6 +62,14 @@ void setup()
 
     pinMode(4, INPUT);
     pinMode(13,OUTPUT);
+
+    pinMode(enA, OUTPUT);
+    pinMode(enB, OUTPUT);
+    pinMode(in1, OUTPUT);
+    pinMode(in2, OUTPUT);
+    pinMode(in3, OUTPUT);
+    pinMode(in4, OUTPUT);
+
 
     pinMode(GPIO_pulse, INPUT_PULLUP);
     digitalWrite(GPIO_pulse, LOW);
@@ -136,14 +156,38 @@ void loop()
     Serial.println(evapRate);
 
     //checks if irradiance is above the set threshold, you put the motor activation code here
-    if(evapRate>threshold)
+    if(evapRate>threshold && !isOpen)
     {
         digitalWrite(13, 1); //turn on the motor
-        Serial.println("yo yo yo!");
+        
+        digitalWrite(in1, 1);
+        digitalWrite(in2, 0);        
+        digitalWrite(in3, 1);        
+        digitalWrite(in4, 0);   
+        delay(3000);     
+
+        digitalWrite(in1, 0);
+        digitalWrite(in2, 0);        
+        digitalWrite(in3, 0);        
+        digitalWrite(in4, 0);   
+        delay(1000);
+
     }
-    else
+    else if (evapRate<threshold && isOpen)
     {
         digitalWrite(13, 0); //turn off the motor
+
+        digitalWrite(in1, 0);
+        digitalWrite(in2, 1);        
+        digitalWrite(in3, 0);        
+        digitalWrite(in4, 1);   
+        delay(3000);     
+
+        digitalWrite(in1, 0);
+        digitalWrite(in2, 0);        
+        digitalWrite(in3, 0);        
+        digitalWrite(in4, 0);   
+        delay(1000);
     }
 
     if (countThing == 1) // Send data per timeasure seconds
